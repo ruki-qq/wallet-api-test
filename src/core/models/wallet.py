@@ -5,9 +5,7 @@ from .base import Base
 
 
 class Wallet(Base):
-    """
-    Model for wallets
-    """
+    """Model for wallets"""
 
     balance: Mapped[int] = mapped_column(BigInteger, default=0, nullable=False)
 
