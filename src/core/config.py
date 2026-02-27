@@ -4,7 +4,7 @@ from pydantic_settings import BaseSettings
 class DBSettings(BaseSettings):
     DB_USER: str = "postgres"
     DB_PASSWORD: str = "postgres"
-    DB_NAME: str = "db_dev"
+    DB_NAME: str = "wallet_test"
     DB_HOST: str = "127.0.0.1"
     DB_PORT: int = 5432
     api_prefix: str = "/api/v1"
