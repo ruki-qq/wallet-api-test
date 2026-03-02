@@ -31,10 +31,6 @@ class OperationType(str, enum.Enum):
 class Operation(Base):
     """Model for wallet operations"""
 
-    id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
-    )
-
     wallet_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True),
         ForeignKey("wallets.id", ondelete="CASCADE"),
@@ -69,9 +65,5 @@ class Operation(Base):
         CheckConstraint("amount > 0", name="ck_wallet_ops_amount_positive"),
         CheckConstraint(
             "balance_after >= 0", name="ck_wallet_ops_balance_after_non_negative"
-        ),
-        CheckConstraint(
-            "operation_type in ('DEPOSIT','WITHDRAW')",
-            name="ck_wallet_ops_type_allowed",
         ),
     )
