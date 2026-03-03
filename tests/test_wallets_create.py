@@ -14,7 +14,7 @@ async def test_create_wallet_default_balance(client):
     assert "wallet_uuid" in data
     assert data["balance"] == 0
 
-    wallet_id = data["wallet_uuid"]
+    wallet_id: str = data["wallet_uuid"]
     resp2 = await client.get(f"{API_URL}/{wallet_id}")
     assert resp2.status_code == 200
     assert resp2.json()["balance"] == 0

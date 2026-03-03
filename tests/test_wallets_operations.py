@@ -21,7 +21,7 @@ async def create_wallet_via_api(
 
 @pytest.mark.asyncio
 async def test_get_wallet_not_found(client):
-    wallet_id = uuid.uuid4()
+    wallet_id: uuid.UUID = uuid.uuid4()
     resp = await client.get(f"{API_URL}/{wallet_id}")
     assert resp.status_code == 404
 
@@ -30,7 +30,7 @@ async def test_get_wallet_not_found(client):
 async def test_deposit_and_get_balance(client):
     r = await create_wallet_via_api(client, balance=0)
     assert r.status_code == 201
-    wallet_id = r.json()["wallet_uuid"]
+    wallet_id: str = r.json()["wallet_uuid"]
 
     resp = await client.post(
         f"{API_URL}/{wallet_id}/operation",
@@ -49,7 +49,7 @@ async def test_deposit_and_get_balance(client):
 async def test_withdraw_success(client):
     r = await create_wallet_via_api(client, balance=1000)
     assert r.status_code == 201
-    wallet_id = r.json()["wallet_uuid"]
+    wallet_id: str = r.json()["wallet_uuid"]
 
     resp = await client.post(
         f"{API_URL}/{wallet_id}/operation",
@@ -64,7 +64,7 @@ async def test_withdraw_success(client):
 async def test_withdraw_insufficient_funds(client, test_session: AsyncSession):
     r = await create_wallet_via_api(client, balance=500)
     assert r.status_code == 201
-    wallet_id = r.json()["wallet_uuid"]
+    wallet_id: str = r.json()["wallet_uuid"]
 
     resp = await client.post(
         f"{API_URL}/{wallet_id}/operation",
@@ -77,12 +77,11 @@ async def test_withdraw_insufficient_funds(client, test_session: AsyncSession):
     assert resp2.status_code == 200
     assert resp2.json()["balance"] == 500
 
-    wallet_uuid = uuid.UUID(wallet_id)
     ops_count = await test_session.scalar(
         select(func.count())
         .select_from(Operation)
         .where(
-            Operation.wallet_id == wallet_uuid,
+            Operation.wallet_id == uuid.UUID(wallet_id),
             Operation.idempotency_key == "k-wd-bad",
         )
     )
@@ -95,8 +94,7 @@ async def test_idempotency_deposit_only_applied_once(
 ):
     r = await create_wallet_via_api(client, balance=0)
     assert r.status_code == 201
-    wallet_id = r.json()["wallet_uuid"]
-    wallet_uuid = uuid.UUID(wallet_id)
+    wallet_id: str = r.json()["wallet_uuid"]
 
     payload = {"operation_type": "DEPOSIT", "amount": 1000}
     headers = {"Idempotency-Key": "same-key"}
@@ -117,7 +115,7 @@ async def test_idempotency_deposit_only_applied_once(
         select(func.count())
         .select_from(Operation)
         .where(
-            Operation.wallet_id == wallet_uuid,
+            Operation.wallet_id == uuid.UUID(wallet_id),
             Operation.idempotency_key == "same-key",
         )
     )
@@ -130,8 +128,7 @@ async def test_idempotency_withdraw_only_applied_once(
 ):
     r = await create_wallet_via_api(client, balance=1000)
     assert r.status_code == 201
-    wallet_id = r.json()["wallet_uuid"]
-    wallet_uuid = uuid.UUID(wallet_id)
+    wallet_id: str = r.json()["wallet_uuid"]
 
     payload = {"operation_type": "WITHDRAW", "amount": 400}
     headers = {"Idempotency-Key": "wd-key"}
@@ -152,7 +149,7 @@ async def test_idempotency_withdraw_only_applied_once(
         select(func.count())
         .select_from(Operation)
         .where(
-            Operation.wallet_id == wallet_uuid,
+            Operation.wallet_id == uuid.UUID(wallet_id),
             Operation.idempotency_key == "wd-key",
         )
     )
