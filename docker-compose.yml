@@ -1,10 +1,8 @@
 services:
   db:
     image: postgres:16
-    environment:
-      POSTGRES_DB: wallet_test
-      POSTGRES_USER: wallet_user
-      POSTGRES_PASSWORD: wallet_password
+    env_file: .env
+    hostname: wallet_db
     ports:
       - 5432:5432
     restart: always
@@ -13,13 +11,9 @@ services:
 
   app:
     build: .
+    env_file: .env
     environment:
-      - DB_HOST=db
-      - DB_PORT=5432
-      - DB_USER=wallet_user
-      - DB_PASSWORD=wallet_password
-      - DB_NAME=wallet_test
-      - DB_URL=postgresql+asyncpg://wallet_user:wallet_password@db:5432/wallet_test
+      WAIT_HOSTS: wallet_db:5432
     depends_on:
       - db
     ports:

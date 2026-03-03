@@ -11,7 +11,8 @@ ENV PYTHONPATH=/app/src
 
 COPY alembic ./alembic
 COPY alembic.ini .
+COPY --from=ghcr.io/ufoscout/docker-compose-wait:latest /wait /wait
 COPY entrypoint.sh .
 
 RUN chmod +x ./entrypoint.sh
-CMD ./entrypoint.sh
+CMD /wait && ./entrypoint.sh
