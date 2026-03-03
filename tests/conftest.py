@@ -12,6 +12,7 @@ from core import Base
 from .utils import override_db_session
 
 TEST_DATABASE_URL = "sqlite+aiosqlite:///:memory:"
+API_URL = "/api/wallets"
 
 
 @pytest.fixture(scope="session")
